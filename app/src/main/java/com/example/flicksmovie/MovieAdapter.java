@@ -10,18 +10,30 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.example.flicksmovie.models.Config;
 import com.example.flicksmovie.models.Movie;
 
 import java.util.ArrayList;
+
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     // list of movies
     ArrayList<Movie> movies;
+    // config needed for image urls
+    Config config;
+    // Context for rendering
+    Context context;
 
     // initialize with list
     public MovieAdapter(ArrayList<Movie> movies) {
         this.movies = movies;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
     }
 
     // creates and inflates a new view
@@ -29,7 +41,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // get the context and create the inflater
-        Context context = parent.getContext();
+        context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         // create the view using the item_movie layout
         View movieView = inflater.inflate(R.layout.item_movie, parent, false);
@@ -46,7 +58,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         holder.tvTitle.setText(movie.getTitle());
         holder.tvOverview.setText(movie.getOverview());
 
-        // TODO -- set image using Glide
+        // buil url for poster image
+        String imageUrl = config.getImageUrl(config.getPosterSize(), movie.getPosterPath());
+
+        // load image using glide
+        Glide.with(context)
+                .load(imageUrl)
+                .bitmapTransform(new RoundedCornersTransformation(context, 35, 0))
+                .placeholder(R.drawable.flicks_movie_placeholder)
+                .error(R.drawable.flicks_movie_placeholder)
+                .into(holder.ivPosterImage);
 
     }
 
